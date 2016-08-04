@@ -39,8 +39,10 @@ namespace NxtSlack
                     Console.WriteLine($"----------------------------------------");
                     Console.WriteLine($"Transaction: {transaction.TransactionId}");
                     Console.WriteLine($"TransactionType: {transaction.SubType}");
-                    Console.WriteLine($"Message from {transaction.SenderRs} to {transaction.RecipientRs}");
-                    Console.WriteLine($"{transaction.Message.MessageText}");
+                    Console.WriteLine($"From: {transaction.SenderRs}");
+                    Console.WriteLine($"To: {transaction.RecipientRs}");
+                    Console.WriteLine($"Message: {transaction.Message.MessageText}");
+                    Console.WriteLine($"----------------------------------------");
                 }
             }
             return lastHeight;
