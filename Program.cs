@@ -15,7 +15,7 @@ namespace NxtSlack
             var serverInfoService = new ServerInfoService(ServerAddress);
             var blockChainStatus = serverInfoService.GetBlockchainStatus().Result;
             var lastHeight = blockChainStatus.NumberOfBlocks - 1;
-            Console.WriteLine("Starting up Nxt Slack Integration Program");
+            Console.WriteLine($"Starting up Nxt Slack Integration Program from height {lastHeight}");
 
             while (true)
             {
@@ -32,7 +32,7 @@ namespace NxtSlack
             while (currentHeight > lastHeight)
             {
                 var blockReply = blockService.GetBlockIncludeTransactions(BlockLocator.ByHeight(++lastHeight)).Result;
-                Console.WriteLine($"New block detected @ height: {blockReply.Height} has {blockReply.Transactions.Count} transactions");
+                Console.WriteLine($"New block detected @ height: {blockReply.Height} has {blockReply.Transactions.Count} transaction(s)");
 
                 foreach (var transaction in blockReply.Transactions.Where(t => t.Message != null && t.Message.IsText))
                 {
