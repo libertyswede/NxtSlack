@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System;
-using NxtLib;
 using NxtLib.Blocks;
 using NxtLib.ServerInfo;
 using System.Threading;
@@ -16,6 +15,7 @@ namespace NxtSlack
             var serverInfoService = new ServerInfoService(ServerAddress);
             var blockChainStatus = serverInfoService.GetBlockchainStatus().Result;
             var lastHeight = blockChainStatus.NumberOfBlocks - 1;
+            Console.WriteLine("Starting up Nxt Slack Integration Program");
 
             while (true)
             {
@@ -32,11 +32,13 @@ namespace NxtSlack
             while (currentHeight > lastHeight)
             {
                 var blockReply = blockService.GetBlockIncludeTransactions(BlockLocator.ByHeight(++lastHeight)).Result;
-                Console.WriteLine($"New block detected @ height: {blockReply.Height}");
+                Console.WriteLine($"New block detected @ height: {blockReply.Height} has {blockReply.Transactions.Count} transactions");
 
-                foreach (var transaction in blockReply.Transactions.Where(t => t.SubType == TransactionSubType.MessagingArbitraryMessage && 
-                                                                               t.Message != null && t.Message.IsText))
+                foreach (var transaction in blockReply.Transactions.Where(t => t.Message != null && t.Message.IsText))
                 {
+                    Console.WriteLine($"----------------------------------------");
+                    Console.WriteLine($"Transaction: {transaction.TransactionId}");
+                    Console.WriteLine($"TransactionType: {transaction.SubType}");
                     Console.WriteLine($"Message from {transaction.SenderRs} to {transaction.RecipientRs}");
                     Console.WriteLine($"{transaction.Message.MessageText}");
                 }
