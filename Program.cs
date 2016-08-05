@@ -53,10 +53,11 @@ namespace NxtSlack
         private static readonly HashSet<ulong> IgnoredAssetIds = new HashSet<ulong>(new [] { superBTCAssetId, superBTCDAssetId });
 
         private const ulong dracoCurrencyId = 9340369183481620469UL;
-        private static readonly HashSet<ulong> IgnoredCurrencyIds = new HashSet<ulong>(new [] {dracoCurrencyId});
+        private const ulong dracoCurrencyId2 = 13507468225104715822UL;
+        private static readonly HashSet<ulong> IgnoredCurrencyIds = new HashSet<ulong>(new [] { dracoCurrencyId, dracoCurrencyId2 });
 
         private const string bittrexAccount = "NXT-97H4-KRWL-A53G-7GVRG";
-        private static readonly HashSet<string> IgnoredPaymentRecipients = new HashSet<string>(new [] {bittrexAccount});
+        private static readonly HashSet<string> IgnoredPaymentRecipients = new HashSet<string>(new [] { bittrexAccount });
 
         private static IEnumerable<Transaction> FilterTransactions(List<Transaction> transactions)
         {
