@@ -34,8 +34,6 @@ namespace NxtSlack
             while (currentHeight > lastHeight)
             {
                 var blockReply = blockService.GetBlockIncludeTransactions(BlockLocator.ByHeight(++lastHeight)).Result;
-                Console.WriteLine($"New block detected @ height: {blockReply.Height} has {blockReply.Transactions.Count} transaction(s)");
-
                 foreach (var transaction in FilterTransactions(blockReply.Transactions))
                 {
                     Console.WriteLine($"----------------------------------------");
@@ -54,8 +52,8 @@ namespace NxtSlack
         private const ulong superBTCAssetId = 12659653638116877017UL;
         private static readonly HashSet<ulong> IgnoredAssetIds = new HashSet<ulong>(new [] { superBTCAssetId, superBTCDAssetId });
 
-        private const ulong dracoMsCoinId = 9340369183481620469UL;
-        private static readonly HashSet<ulong> IgnoredMsCoinIds = new HashSet<ulong>(new [] {dracoMsCoinId});
+        private const ulong dracoCurrencyId = 9340369183481620469UL;
+        private static readonly HashSet<ulong> IgnoredCurrencyIds = new HashSet<ulong>(new [] {dracoCurrencyId});
 
         private static IEnumerable<Transaction> FilterTransactions(List<Transaction> transactions)
         {
@@ -72,7 +70,7 @@ namespace NxtSlack
             foreach (var msTransferTransaction in query.Where(t => t.SubType == TransactionSubType.MonetarySystemCurrencyTransfer))
             {
                 var attachment = (MonetarySystemCurrencyTransferAttachment)msTransferTransaction.Attachment;
-                if (IgnoredMsCoinIds.Contains(attachment.CurrencyId))
+                if (IgnoredCurrencyIds.Contains(attachment.CurrencyId))
                 {
                     query = query.Where(t => t.TransactionId != msTransferTransaction.TransactionId);
                 }
