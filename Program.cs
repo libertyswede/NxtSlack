@@ -3,6 +3,8 @@ using System;
 using NxtLib.Blocks;
 using NxtLib.ServerInfo;
 using System.Threading;
+using System.Collections.Generic;
+using NxtLib;
 
 namespace NxtSlack
 {
@@ -34,7 +36,7 @@ namespace NxtSlack
                 var blockReply = blockService.GetBlockIncludeTransactions(BlockLocator.ByHeight(++lastHeight)).Result;
                 Console.WriteLine($"New block detected @ height: {blockReply.Height} has {blockReply.Transactions.Count} transaction(s)");
 
-                foreach (var transaction in blockReply.Transactions.Where(t => t.Message != null && t.Message.IsText))
+                foreach (var transaction in FilterTransactions(blockReply.Transactions))
                 {
                     Console.WriteLine($"----------------------------------------");
                     Console.WriteLine($"Transaction: {transaction.TransactionId}");
@@ -46,6 +48,37 @@ namespace NxtSlack
                 }
             }
             return lastHeight;
+        }
+
+        private const ulong superBTCDAssetId = 6918149200730574743UL;
+        private const ulong superBTCAssetId = 12659653638116877017UL;
+        private static readonly HashSet<ulong> IgnoredAssetIds = new HashSet<ulong>(new [] { superBTCAssetId, superBTCDAssetId });
+
+        private const ulong dracoMsCoinId = 9340369183481620469UL;
+        private static readonly HashSet<ulong> IgnoredMsCoinIds = new HashSet<ulong>(new [] {dracoMsCoinId});
+
+        private static IEnumerable<Transaction> FilterTransactions(List<Transaction> transactions)
+        {
+            var query = transactions.Where(t => t.Message != null && t.Message.IsText);
+            
+            foreach (var assetTransferTransaction in query.Where(t => t.SubType == TransactionSubType.ColoredCoinsAssetTransfer))
+            {
+                var attachment = (ColoredCoinsAssetTransferAttachment)assetTransferTransaction.Attachment;
+                if (IgnoredAssetIds.Contains(attachment.AssetId))
+                {
+                    query = query.Where(t => t.TransactionId != assetTransferTransaction.TransactionId);
+                }
+            }
+            foreach (var msTransferTransaction in query.Where(t => t.SubType == TransactionSubType.MonetarySystemCurrencyTransfer))
+            {
+                var attachment = (MonetarySystemCurrencyTransferAttachment)msTransferTransaction.Attachment;
+                if (IgnoredMsCoinIds.Contains(attachment.CurrencyId))
+                {
+                    query = query.Where(t => t.TransactionId != msTransferTransaction.TransactionId);
+                }
+            }
+
+            return query;
         }
     }
 }
